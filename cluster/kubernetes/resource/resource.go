@@ -3,6 +3,7 @@ package resource
 import (
 	"strings"
 
+	jsonyaml "github.com/ghodss/yaml"
 	"gopkg.in/yaml.v2"
 
 	fluxerr "github.com/weaveworks/flux/errors"
@@ -11,12 +12,13 @@ import (
 )
 
 const (
-	PolicyPrefix = "fluxcd.io/"
+	PolicyPrefix       = "fluxcd.io/"
+	FilterPolicyPrefix = "filter.flux.weave.works/"
 	// This is the previously-used prefix for annotations; many
 	// manifests in the wild will still be using it, so it's included
 	// here for backward-compatibility.
 	AlternatePolicyPrefix = "flux.weave.works/"
-	ClusterScope          = "<cluster>"
+	ClusterScope       = "<cluster>"
 )
 
 // KubeManifest represents a manifest for a Kubernetes resource. For
@@ -99,6 +101,8 @@ func PoliciesFromAnnotations(annotations map[string]string) policy.Set {
 			p = strings.TrimPrefix(k, PolicyPrefix)
 		case strings.HasPrefix(k, AlternatePolicyPrefix):
 			p = strings.TrimPrefix(k, AlternatePolicyPrefix)
+		case strings.HasPrefix(k, FilterPolicyPrefix):
+			p = "tag." + strings.TrimPrefix(k, FilterPolicyPrefix)
 		default:
 			continue
 		}
@@ -198,7 +202,11 @@ func unmarshalKind(base baseObject, bytes []byte) (KubeManifest, error) {
 		return &list, nil
 	case base.Kind == "FluxHelmRelease" || base.Kind == "HelmRelease":
 		var fhr = FluxHelmRelease{baseObject: base}
-		if err := yaml.Unmarshal(bytes, &fhr); err != nil {
+		// NB: workaround for go-yaml/yaml/issues/139
+		// By using github.com/ghodss/yaml to unmarshal HelmReleases.
+		// This effectively results in all keys of `Value`s being strings
+		// and not interface{}.
+		if err := jsonyaml.Unmarshal(bytes, &fhr); err != nil {
 			return nil, err
 		}
 		return &fhr, nil

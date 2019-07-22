@@ -133,7 +133,34 @@ func (m *manifests) ParseManifest(def []byte, source string) (map[string]resourc
 }
 
 func (m *manifests) SetWorkloadContainerImage(def []byte, id resource.ID, container string, image image.Ref) ([]byte, error) {
-	return updateWorkload(def, id, container, image)
+	resources, err := m.ParseManifest(def, "stdin")
+	if err != nil {
+		return nil, err
+	}
+	res, ok := resources[id.String()]
+	if !ok {
+		return nil, fmt.Errorf("resource %s not found", id.String())
+	}
+	// Check if the workload is a HelmRelease, and try to resolve an image
+	// map for the given container to perform an update based on mapped YAML
+	// dot notation paths. If resolving the map fails (either because there
+	// is no map for the given container, or the mapping does not resolve
+	// in to a valid image ref), fallback to the default behaviour.
+	//
+	// NB: we do this here and not in e.g. the `resource` package, to ensure
+	// everything _outside_ this package only knows about Kubernetes native
+	// containers, and not the dot notation YAML paths we invented for custom
+	// Helm value structures.
+	if hr, ok := res.(*kresource.FluxHelmRelease); ok {
+		if paths, err := hr.GetContainerImageMap(container); err == nil {
+			def, err := updateWorkloadImagePaths(def, id, paths, image)
+			if err == nil {
+				return def, err
+			}
+			m.logger.Log("warning", fmt.Sprintf("%s", err))
+		}
+	}
+	return updateWorkloadContainer(def, id, container, image)
 }
 
 func (m *manifests) CreateManifestPatch(originalManifests, modifiedManifests []byte, originalSource, modifiedSource string) ([]byte, error) {

@@ -3,19 +3,21 @@ package kubernetes
 import (
 	"testing"
 
+	kresource "github.com/weaveworks/flux/cluster/kubernetes/resource"
 	"github.com/weaveworks/flux/image"
 	"github.com/weaveworks/flux/resource"
 )
 
 type update struct {
-	name            string
-	resourceID      string
-	containers      []string
-	updatedImage    string
-	caseIn, caseOut string
+	name             string
+	resourceID       string
+	containers       []string
+	updatedImage     string
+	caseIn, caseOut  string
+	imageAnnotations kresource.ContainerImageMap
 }
 
-func testUpdate(t *testing.T, u update) {
+func testUpdateWorkloadContainer(t *testing.T, u update) {
 	id, err := image.ParseRef(u.updatedImage)
 	if err != nil {
 		t.Fatal(err)
@@ -25,7 +27,7 @@ func testUpdate(t *testing.T, u update) {
 	for _, container := range u.containers {
 		var out []byte
 		var err error
-		if out, err = updateWorkload([]byte(manifest), resource.MustParseID(u.resourceID), container, id); err != nil {
+		if out, err = updateWorkloadContainer([]byte(manifest), resource.MustParseID(u.resourceID), container, id); err != nil {
 			t.Errorf("Failed: %s", err.Error())
 			return
 		}
@@ -36,30 +38,56 @@ func testUpdate(t *testing.T, u update) {
 	}
 }
 
-func TestUpdates(t *testing.T) {
+func testUpdateWorkloadImagePath(t *testing.T, u update) {
+	id, err := image.ParseRef(u.updatedImage)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	manifest := u.caseIn
+	var out []byte
+	if out, err = updateWorkloadImagePaths([]byte(manifest), resource.MustParseID(u.resourceID), u.imageAnnotations, id); err != nil {
+		t.Errorf("Failed: %s", err.Error())
+		return
+	}
+	manifest = string(out)
+	if manifest != u.caseOut {
+		t.Errorf("id not get expected result:\n\n%s\n\nInstead got:\n\n%s", u.caseOut, manifest)
+	}
+}
+
+func TestWorkloadContainerUpdates(t *testing.T) {
 	for _, c := range []update{
-		{"common case", case1resource, case1container, case1image, case1, case1out},
-		{"new version like number", case2resource, case2container, case2image, case2, case2out},
-		{"old version like number", case2resource, case2container, case2reverseImage, case2out, case2},
-		{"name label out of order", case3resource, case3container, case3image, case3, case3out},
-		{"version (tag) with dots", case4resource, case4container, case4image, case4, case4out},
-		{"minimal dockerhub image name", case5resource, case5container, case5image, case5, case5out},
-		{"reordered keys", case6resource, case6containers, case6image, case6, case6out},
-		{"from prod", case7resource, case7containers, case7image, case7, case7out},
-		{"single quotes", case8resource, case8containers, case8image, case8, case8out},
-		{"in multidoc", case9resource, case9containers, case9image, case9, case9out},
-		{"in kubernetes List resource", case10resource, case10containers, case10image, case10, case10out},
-		{"FluxHelmRelease (v1alpha2; simple image encoding)", case11resource, case11containers, case11image, case11, case11out},
-		{"FluxHelmRelease (v1alpha2; multi image encoding)", case12resource, case12containers, case12image, case12, case12out},
-		{"HelmRelease (v1beta1; image with port number)", case13resource, case13containers, case13image, case13, case13out},
-		{"initContainer", case14resource, case14containers, case14image, case14, case14out},
+		{"common case", case1resource, case1container, case1image, case1, case1out, emptyContainerImageMap},
+		{"new version like number", case2resource, case2container, case2image, case2, case2out, emptyContainerImageMap},
+		{"old version like number", case2resource, case2container, case2reverseImage, case2out, case2, emptyContainerImageMap},
+		{"name label out of order", case3resource, case3container, case3image, case3, case3out, emptyContainerImageMap},
+		{"version (tag) with dots", case4resource, case4container, case4image, case4, case4out, emptyContainerImageMap},
+		{"minimal dockerhub image name", case5resource, case5container, case5image, case5, case5out, emptyContainerImageMap},
+		{"reordered keys", case6resource, case6containers, case6image, case6, case6out, emptyContainerImageMap},
+		{"from prod", case7resource, case7containers, case7image, case7, case7out, emptyContainerImageMap},
+		{"single quotes", case8resource, case8containers, case8image, case8, case8out, emptyContainerImageMap},
+		{"in multidoc", case9resource, case9containers, case9image, case9, case9out, emptyContainerImageMap},
+		{"in kubernetes List resource", case10resource, case10containers, case10image, case10, case10out, emptyContainerImageMap},
+		{"FluxHelmRelease (v1alpha2; simple image encoding)", case11resource, case11containers, case11image, case11, case11out, emptyContainerImageMap},
+		{"FluxHelmRelease (v1alpha2; multi image encoding)", case12resource, case12containers, case12image, case12, case12out, emptyContainerImageMap},
+		{"HelmRelease (v1beta1; image with port number)", case13resource, case13containers, case13image, case13, case13out, emptyContainerImageMap},
+		{"HelmRelease (with image map)", case14resource, make([]string, 0), case14image, case14, case14, case14ImageMap},
+		{"initContainer", case15resource, case15containers, case15image, case15, case15out, emptyContainerImageMap},
 	} {
 		t.Run(c.name, func(t *testing.T) {
-			testUpdate(t, c)
+			switch c.imageAnnotations {
+			case emptyContainerImageMap:
+				testUpdateWorkloadContainer(t, c)
+			default:
+				testUpdateWorkloadImagePath(t, c)
+			}
 			t.Parallel()
 		})
 	}
 }
+
+var emptyContainerImageMap = kresource.ContainerImageMap{}
 
 // Unusual but still valid indentation between containers: and the
 // next line
@@ -922,6 +950,61 @@ spec:
 `
 
 const case14 = `---
+apiVersion: flux.weave.works/v1beta1
+kind: HelmRelease
+metadata:
+  name: mariadb
+  namespace: maria
+  annotations:
+    repository.flux.weave.works/custom: mariadb.customImage
+    tag.flux.weave.works/custom: mariadb.customTag
+spec:
+  chart:
+    repository: https://example.com/charts
+    name: mariadb
+    version: 1.1.2
+  values:
+    mariadb:
+      customImage: localhost:5000/mariadb
+      customTag: 10.1.33
+`
+
+const case14resource = "maria:helmrelease/mariadb"
+
+var case14ImageMap = kresource.ContainerImageMap{
+	BasePath:   kresource.ImageBasePath,
+	Repository: "mariadb.customImage",
+	Tag:        "mariadb.customTag",
+}
+
+const case14image = "localhost:5000/mariadb:10.1.33"
+
+const case14out = `---
+apiVersion: flux.weave.works/v1beta1
+kind: HelmRelease
+metadata:
+  name: mariadb
+  namespace: maria
+  annotations:
+    repository.flux.weave.works/custom: mariadb.customImage
+    tag.flux.weave.works/custom: mariadb.customTag
+spec:
+  chart:
+    repository: https://example.com/charts
+    name: mariadb
+    version: 1.1.2
+  values:
+    mariadb:
+      customImage: localhost:5000/mariadb
+      customTag: 10.1.33
+      persistence:
+        enabled: false
+    workProperly: true
+    sidecar:
+      image: sidecar:v1
+`
+
+const case15 = `---
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
@@ -938,12 +1021,12 @@ spec:
         image: 'weaveworks/weave-kube:2.2.0'
 `
 
-const case14resource = "default:deployment/weave"
-const case14image = "weaveworks/weave-kube:2.2.1"
+const case15resource = "default:deployment/weave"
+const case15image = "weaveworks/weave-kube:2.2.1"
 
-var case14containers = []string{"weave"}
+var case15containers = []string{"weave"}
 
-const case14out = `---
+const case15out = `---
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:

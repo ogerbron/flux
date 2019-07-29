@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/weaveworks/flux/resource"
+	"github.com/fluxcd/flux/resource"
 )
 
 func TestParseImageOnlyFormat(t *testing.T) {

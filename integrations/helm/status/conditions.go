@@ -3,8 +3,8 @@ package status
 import (
 	"k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"github.com/weaveworks/flux/integrations/apis/flux.weave.works/v1beta1"
-	v1beta1client "github.com/weaveworks/flux/integrations/client/clientset/versioned/typed/flux.weave.works/v1beta1"
+	"github.com/fluxcd/flux/integrations/apis/flux.weave.works/v1beta1"
+	v1beta1client "github.com/fluxcd/flux/integrations/client/clientset/versioned/typed/flux.weave.works/v1beta1"
 )
 
 

@@ -28,9 +28,9 @@ import (
 	hapi_release "k8s.io/helm/pkg/proto/hapi/release"
 	helmutil "k8s.io/helm/pkg/releaseutil"
 
-	fluxk8s "github.com/weaveworks/flux/cluster/kubernetes"
-	flux_v1beta1 "github.com/weaveworks/flux/integrations/apis/flux.weave.works/v1beta1"
-	"github.com/weaveworks/flux/resource"
+	fluxk8s "github.com/fluxcd/flux/cluster/kubernetes"
+	flux_v1beta1 "github.com/fluxcd/flux/integrations/apis/flux.weave.works/v1beta1"
+	"github.com/fluxcd/flux/resource"
 )
 
 type Action string

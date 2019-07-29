@@ -15,7 +15,7 @@ import (
 	helmenv "k8s.io/helm/pkg/helm/environment"
 	"k8s.io/helm/pkg/repo"
 
-	flux_v1beta1 "github.com/weaveworks/flux/integrations/apis/flux.weave.works/v1beta1"
+	flux_v1beta1 "github.com/fluxcd/flux/integrations/apis/flux.weave.works/v1beta1"
 )
 
 // makeChartPath gives the expected filesystem location for a chart,

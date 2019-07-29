@@ -31,7 +31,7 @@ parts:
   fluxctl:
     source: .
     plugin: go
-    go-importpath: github.com/weaveworks/flux
+    go-importpath: github.com/fluxcd/flux
     build-packages:
       - gcc
     stage:

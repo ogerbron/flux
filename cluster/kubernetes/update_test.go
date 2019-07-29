@@ -3,8 +3,8 @@ package kubernetes
 import (
 	"testing"
 
-	"github.com/weaveworks/flux/image"
-	"github.com/weaveworks/flux/resource"
+	"github.com/fluxcd/flux/image"
+	"github.com/fluxcd/flux/resource"
 )
 
 type update struct {

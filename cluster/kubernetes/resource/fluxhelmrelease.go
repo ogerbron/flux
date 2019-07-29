@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"sort"
 
-	"github.com/weaveworks/flux/image"
-	"github.com/weaveworks/flux/resource"
+	"github.com/fluxcd/flux/image"
+	"github.com/fluxcd/flux/resource"
 )
 
 // ReleaseContainerName is the name used when Flux interprets a

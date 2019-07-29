@@ -16,15 +16,15 @@ import (
 	"k8s.io/client-go/util/workqueue"
 	"k8s.io/klog"
 
-	"github.com/weaveworks/flux/checkpoint"
-	clientset "github.com/weaveworks/flux/integrations/client/clientset/versioned"
-	ifinformers "github.com/weaveworks/flux/integrations/client/informers/externalversions"
-	fluxhelm "github.com/weaveworks/flux/integrations/helm"
-	"github.com/weaveworks/flux/integrations/helm/chartsync"
-	daemonhttp "github.com/weaveworks/flux/integrations/helm/http/daemon"
-	"github.com/weaveworks/flux/integrations/helm/operator"
-	"github.com/weaveworks/flux/integrations/helm/release"
-	"github.com/weaveworks/flux/integrations/helm/status"
+	"github.com/fluxcd/flux/checkpoint"
+	clientset "github.com/fluxcd/flux/integrations/client/clientset/versioned"
+	ifinformers "github.com/fluxcd/flux/integrations/client/informers/externalversions"
+	fluxhelm "github.com/fluxcd/flux/integrations/helm"
+	"github.com/fluxcd/flux/integrations/helm/chartsync"
+	daemonhttp "github.com/fluxcd/flux/integrations/helm/http/daemon"
+	"github.com/fluxcd/flux/integrations/helm/operator"
+	"github.com/fluxcd/flux/integrations/helm/release"
+	"github.com/fluxcd/flux/integrations/helm/status"
 )
 
 var (

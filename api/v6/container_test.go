@@ -6,8 +6,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/weaveworks/flux/image"
-	"github.com/weaveworks/flux/policy"
+	"github.com/fluxcd/flux/image"
+	"github.com/fluxcd/flux/policy"
 )
 
 func TestNewContainer(t *testing.T) {

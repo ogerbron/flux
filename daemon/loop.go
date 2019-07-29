@@ -3,12 +3,12 @@ package daemon
 import (
 	"context"
 	"fmt"
-	"github.com/weaveworks/flux/git"
+	"github.com/fluxcd/flux/git"
 	"sync"
 	"time"
 
 	"github.com/go-kit/kit/log"
-	fluxmetrics "github.com/weaveworks/flux/metrics"
+	fluxmetrics "github.com/fluxcd/flux/metrics"
 )
 
 type LoopVars struct {

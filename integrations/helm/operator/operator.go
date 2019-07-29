@@ -18,12 +18,12 @@ import (
 	"k8s.io/client-go/tools/record"
 	"k8s.io/client-go/util/workqueue"
 
-	flux_v1beta1 "github.com/weaveworks/flux/integrations/apis/flux.weave.works/v1beta1"
-	ifscheme "github.com/weaveworks/flux/integrations/client/clientset/versioned/scheme"
-	fhrv1 "github.com/weaveworks/flux/integrations/client/informers/externalversions/flux.weave.works/v1beta1"
-	iflister "github.com/weaveworks/flux/integrations/client/listers/flux.weave.works/v1beta1"
-	"github.com/weaveworks/flux/integrations/helm/chartsync"
-	"github.com/weaveworks/flux/integrations/helm/status"
+	flux_v1beta1 "github.com/fluxcd/flux/integrations/apis/flux.weave.works/v1beta1"
+	ifscheme "github.com/fluxcd/flux/integrations/client/clientset/versioned/scheme"
+	fhrv1 "github.com/fluxcd/flux/integrations/client/informers/externalversions/flux.weave.works/v1beta1"
+	iflister "github.com/fluxcd/flux/integrations/client/listers/flux.weave.works/v1beta1"
+	"github.com/fluxcd/flux/integrations/helm/chartsync"
+	"github.com/fluxcd/flux/integrations/helm/status"
 )
 
 const (

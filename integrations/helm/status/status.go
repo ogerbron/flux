@@ -24,10 +24,10 @@ import (
 	"k8s.io/helm/pkg/helm"
 	helmrelease "k8s.io/helm/pkg/proto/hapi/release"
 
-	"github.com/weaveworks/flux/integrations/apis/flux.weave.works/v1beta1"
-	ifclientset "github.com/weaveworks/flux/integrations/client/clientset/versioned"
-	iflister "github.com/weaveworks/flux/integrations/client/listers/flux.weave.works/v1beta1"
-	v1beta1client "github.com/weaveworks/flux/integrations/client/clientset/versioned/typed/flux.weave.works/v1beta1"
+	"github.com/fluxcd/flux/integrations/apis/flux.weave.works/v1beta1"
+	ifclientset "github.com/fluxcd/flux/integrations/client/clientset/versioned"
+	iflister "github.com/fluxcd/flux/integrations/client/listers/flux.weave.works/v1beta1"
+	v1beta1client "github.com/fluxcd/flux/integrations/client/clientset/versioned/typed/flux.weave.works/v1beta1"
 )
 
 const period = 10 * time.Second

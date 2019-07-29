@@ -11,8 +11,8 @@ import (
 	"github.com/go-kit/kit/log"
 	"github.com/gorilla/mux"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"github.com/weaveworks/flux/integrations/helm/api"
-	transport "github.com/weaveworks/flux/integrations/helm/http"
+	"github.com/fluxcd/flux/integrations/helm/api"
+	transport "github.com/fluxcd/flux/integrations/helm/http"
 )
 
 // ListenAndServe starts a HTTP server instrumented with Prometheus metrics,

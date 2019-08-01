@@ -1,3 +1,32 @@
+## 0.10.1 (2019-08-01)
+
+### Bug fixes
+
+ - Fixed `rollback.timeout` definition in the `CustomResourceDefinition`
+   [weaveworks/flux#2251][#2251]
+ - Fixed the merge of values
+   [weaveworks/flux#2292][#2292]
+ - Correct spelling of integrations, and fix `make check-generated`
+   [weaveworks/flux#2312][#2312]
+ - Moved successful chart fetch signal to reconcile action (to prevent
+   an infinite loop due to the `LastUpdateTime` on the condition getting
+   accidentally updated during rollback checks).
+   [weaveworks/flux#2316][#2316]
+ - Fixed typo in `ReasonUpgradeFailed` condition change reason
+   [weaveworks/flux#2317][#2317]
+
+### Thanks
+
+This release was made possible by contributions from @jfrndz, @adrian,
+@stefanprodan, @obiesmans, @chriscorn-takt, @sureshamk, @dholbach,
+@squaremo, and @hiddeco.
+
+[#2251]: https://github.com/fluxcd/flux/pull/2251
+[#2292]: https://github.com/fluxcd/flux/pull/2292
+[#2312]: https://github.com/fluxcd/flux/pull/2312
+[#2316]: https://github.com/fluxcd/flux/pull/2316
+[#2317]: https://github.com/fluxcd/flux/pull/2317
+
 ## 0.10.0 (2019-07-10)
 
 This release brings you [opt-in automated rollback support][rollback docs],
